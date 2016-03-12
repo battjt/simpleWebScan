@@ -3,7 +3,8 @@
 # Joe at SolidDesign.net
 # 1/26/2016
 
-PORT=8000
+INTERFACE=10.2.0.1
+PORT=8001
 
 TEMP=/tmp/sws.out.$$.ppm
 FIFO=/tmp/sws.fifo.$$
@@ -20,11 +21,11 @@ do
     echo Scanning at $RESOLUTION DPI... 1>&2
       echo Content-type: image/jpeg
       echo
-      scanimage --resolution $RESOLUTION > $TEMP
+      scanimage -p --resolution $RESOLUTION > $TEMP
       echo Processing... 1>&2
       convert $TEMP -crop $(convert $TEMP -virtual-pixel edge -blur 0x15 -fuzz 15% -trim -format '%[fx:w]x%[fx:h]+%[fx:page.x]+%[fx:page.y]' info:) +repage - |
 	  pnmtojpeg
-      rm $TEMP
+      # rm $TEMP
       echo Done. 1>&2
     else
       # invalid resoltion, so return web page
@@ -61,7 +62,7 @@ cat << EOF
 EOF
     fi
   ) |
-  nc -l $PORT > $FIFO
+  nc -l $INTERFACE $PORT > $FIFO
 
   # drain the fifo
   dd if=$FIFO iflag=nonblock of=/dev/null 2> /dev/null
