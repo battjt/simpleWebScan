@@ -13,7 +13,7 @@ mkfifo $FIFO
 while true
 do 
   (
-    IFS=" ?/" read GET RESOLUTION HTTP < $FIFO 
+    IFS=" ?/" read GET RESOLUTION HTTP
     echo HTTP/1.0 200 OK
     # is resolution a number?
     if [ "$RESOLUTION" -eq "$RESOLUTION" ] 
@@ -61,7 +61,7 @@ cat << EOF
 </center></body></html>
 EOF
     fi
-  ) |
+  ) < $FIFO |
   nc -l $INTERFACE $PORT > $FIFO
 
   # drain the fifo
